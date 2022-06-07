@@ -26,6 +26,38 @@
 #include <cwchar>
 #include <string>
 
+#ifndef SCN_DEFAULT_LOCALE_TRUE
+#define SCN_DEFAULT_LOCALE_TRUE "true"
+#endif
+
+#ifndef SCN_DEFAULT_LOCALE_FALSE
+#define SCN_DEFAULT_LOCALE_FALSE "false"
+#endif
+
+#ifndef SCN_DEFAULT_LOCALE_DECIMAL
+#define SCN_DEFAULT_LOCALE_DECIMAL '.'
+#endif
+
+#ifndef SCN_DEFAULT_LOCALE_SEPARATOR
+#define SCN_DEFAULT_LOCALE_SEPARATOR ','
+#endif
+
+#ifndef SCN_DEFAULT_LOCALE_TRUE_WIDE
+#define SCN_DEFAULT_LOCALE_TRUE_WIDE L"true"
+#endif
+
+#ifndef SCN_DEFAULT_LOCALE_FALSE_WIDE
+#define SCN_DEFAULT_LOCALE_FALSE_WIDE L"false"
+#endif
+
+#ifndef SCN_DEFAULT_LOCALE_DECIMAL_WIDE
+#define SCN_DEFAULT_LOCALE_DECIMAL_WIDE L'.'
+#endif
+
+#ifndef SCN_DEFAULT_LOCALE_SEPARATOR_WIDE
+#define SCN_DEFAULT_LOCALE_SEPARATOR_WIDE L','
+#endif
+
 namespace scn {
     SCN_BEGIN_NAMESPACE
 
@@ -112,38 +144,38 @@ namespace scn {
         struct locale_defaults<char> {
             static constexpr string_view truename()
             {
-                return {"true"};
+                return {SCN_DEFAULT_LOCALE_TRUE};
             }
             static constexpr string_view falsename()
             {
-                return {"false"};
+                return {SCN_DEFAULT_LOCALE_FALSE};
             }
             static constexpr char decimal_point() noexcept
             {
-                return '.';
+                return SCN_DEFAULT_LOCALE_DECIMAL;
             }
             static constexpr char thousands_separator() noexcept
             {
-                return ',';
+                return SCN_DEFAULT_LOCALE_SEPARATOR;
             }
         };
         template <>
         struct locale_defaults<wchar_t> {
             static constexpr wstring_view truename()
             {
-                return {L"true"};
+                return {SCN_DEFAULT_LOCALE_TRUE_WIDE};
             }
             static constexpr wstring_view falsename()
             {
-                return {L"false"};
+                return {SCN_DEFAULT_LOCALE_FALSE_WIDE};
             }
             static constexpr wchar_t decimal_point() noexcept
             {
-                return L'.';
+                return SCN_DEFAULT_LOCALE_DECIMAL_WIDE;
             }
             static constexpr wchar_t thousands_separator() noexcept
             {
-                return L',';
+                return SCN_DEFAULT_LOCALE_SEPARATOR_WIDE;
             }
         };
     }  // namespace detail

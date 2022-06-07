@@ -116,6 +116,15 @@ namespace scn {
         template <typename Context, typename ParseCtx, typename T>
         error scan_custom_arg(void* arg, Context& ctx, ParseCtx& pctx) noexcept
         {
+#if !SCN_USE_FLOAT
+            static_assert(!std::is_same<T, float>::value, "float support is disabled");
+#endif
+#if !SCN_USE_DOUBLE
+            static_assert(!std::is_same<T, double>::value, "double support is disabled");
+#endif
+#if !SCN_USE_LONG_DOUBLE
+            static_assert(!std::is_same<T, long double>::value, "long double support is disabled");
+#endif
             return visitor_boilerplate<scanner<T>>(*static_cast<T*>(arg), ctx,
                                                    pctx);
         }

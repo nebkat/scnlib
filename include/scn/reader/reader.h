@@ -76,15 +76,21 @@ namespace scn {
     struct scanner<unsigned long long>
         : public detail::integer_scanner<unsigned long long> {
     };
+#if SCN_USE_FLOAT
     template <>
     struct scanner<float> : public detail::float_scanner<float> {
     };
+#endif
+#if SCN_USE_DOUBLE
     template <>
     struct scanner<double> : public detail::float_scanner<double> {
     };
+#endif
+#if SCN_USE_LONG_DOUBLE
     template <>
     struct scanner<long double> : public detail::float_scanner<long double> {
     };
+#endif
     template <typename CharT, typename Allocator>
     struct scanner<std::basic_string<CharT, std::char_traits<CharT>, Allocator>>
         : public detail::string_scanner {

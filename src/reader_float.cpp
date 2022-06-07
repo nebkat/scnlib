@@ -142,6 +142,7 @@ namespace scn {
             template <typename CharT, typename T>
             struct read;
 
+#if SCN_USE_FLOAT
             template <>
             struct read<char, float> {
                 static expected<float> get(const char* str,
@@ -151,28 +152,6 @@ namespace scn {
                     return impl<float>(strtof, HUGE_VALF, str, chars, options);
                 }
             };
-
-            template <>
-            struct read<char, double> {
-                static expected<double> get(const char* str,
-                                            size_t& chars,
-                                            uint8_t options)
-                {
-                    return impl<double>(strtod, HUGE_VAL, str, chars, options);
-                }
-            };
-
-            template <>
-            struct read<char, long double> {
-                static expected<long double> get(const char* str,
-                                                 size_t& chars,
-                                                 uint8_t options)
-                {
-                    return impl<long double>(strtold, HUGE_VALL, str, chars,
-                                             options);
-                }
-            };
-
             template <>
             struct read<wchar_t, float> {
                 static expected<float> get(const wchar_t* str,
@@ -182,6 +161,17 @@ namespace scn {
                     return impl<float>(wcstof, HUGE_VALF, str, chars, options);
                 }
             };
+#endif
+#if SCN_USE_DOUBLE
+            template <>
+            struct read<char, double> {
+                static expected<double> get(const char* str,
+                                            size_t& chars,
+                                            uint8_t options)
+                {
+                    return impl<double>(strtod, HUGE_VAL, str, chars, options);
+                }
+            };
             template <>
             struct read<wchar_t, double> {
                 static expected<double> get(const wchar_t* str,
@@ -189,6 +179,18 @@ namespace scn {
                                             uint8_t options)
                 {
                     return impl<double>(wcstod, HUGE_VAL, str, chars, options);
+                }
+            };
+#endif
+#if SCN_USE_LONG_DOUBLE
+            template <>
+            struct read<char, long double> {
+                static expected<long double> get(const char* str,
+                                                 size_t& chars,
+                                                 uint8_t options)
+                {
+                    return impl<long double>(strtold, HUGE_VALL, str, chars,
+                                             options);
                 }
             };
             template <>
@@ -201,6 +203,7 @@ namespace scn {
                                              options);
                 }
             };
+#endif
         }  // namespace cstd
 
         namespace from_chars {
@@ -316,6 +319,7 @@ namespace scn {
             template <typename T>
             struct read;
 
+#if SCN_USE_FLOAT
             template <>
             struct read<float> {
                 static expected<float> get(const char* str,
@@ -327,6 +331,8 @@ namespace scn {
                                        locale_decimal_point);
                 }
             };
+#endif
+#if SCN_USE_DOUBLE
             template <>
             struct read<double> {
                 static expected<double> get(const char* str,
@@ -338,6 +344,8 @@ namespace scn {
                                         locale_decimal_points);
                 }
             };
+#endif
+#if SCN_USE_LONG_DOUBLE
             template <>
             struct read<long double> {
                 static expected<long double> get(const char* str,
@@ -351,6 +359,7 @@ namespace scn {
                                                               options);
                 }
             };
+#endif
         }  // namespace fast_float
 
         template <typename CharT, typename T>
@@ -406,26 +415,33 @@ namespace scn {
 
 #if SCN_INCLUDE_SOURCE_DEFINITIONS
 
+#if SCN_USE_FLOAT
         template expected<float>
         float_scanner<float>::_read_float_impl(const char*, size_t&, char);
-        template expected<double>
-        float_scanner<double>::_read_float_impl(const char*, size_t&, char);
-        template expected<long double>
-        float_scanner<long double>::_read_float_impl(const char*,
-                                                     size_t&,
-                                                     char);
         template expected<float> float_scanner<float>::_read_float_impl(
             const wchar_t*,
             size_t&,
             wchar_t);
+#endif
+#if SCN_USE_DOUBLE
+        template expected<double>
+        float_scanner<double>::_read_float_impl(const char*, size_t&, char);
         template expected<double> float_scanner<double>::_read_float_impl(
             const wchar_t*,
             size_t&,
             wchar_t);
+#endif
+#if SCN_USE_LONG_DOUBLE
+        template expected<long double>
+        float_scanner<long double>::_read_float_impl(const char*,
+                                                     size_t&,
+                                                     char);
         template expected<long double>
         float_scanner<long double>::_read_float_impl(const wchar_t*,
                                                      size_t&,
                                                      wchar_t);
+#endif
+
 #endif
     }  // namespace detail
 

@@ -36,6 +36,10 @@ option(SCN_BUILD_BUILDTIME "Generate build time test target" OFF)
 
 option(SCN_USE_BUNDLED_FAST_FLOAT "Use lemire/fast_float bundled with scnlib" ON)
 
+option(SCN_USE_FLOAT "Enable float support" ON)
+option(SCN_USE_DOUBLE "Enable double support" ON)
+option(SCN_USE_LONG_DOUBLE "Enable long double support" ON)
+
 file(READ include/scn/detail/config.h config_h)
 if (NOT config_h MATCHES "SCN_VERSION SCN_COMPILER\\(([0-9]+), ([0-9]+), ([0-9]+)\\)")
     message(FATAL_ERROR "Cannot get SCN_VERSION from config.h")
@@ -83,6 +87,13 @@ function(generate_library_target target_name)
     target_compile_features(${target_name} PUBLIC cxx_std_11)
     set_private_flags(${target_name})
 
+    target_compile_definitions(${target_name} PUBLIC
+        -DSCN_USE_FLOAT=$<IF:$<BOOL:${SCN_USE_FLOAT}>,1,0>)
+    target_compile_definitions(${target_name} PUBLIC
+        -DSCN_USE_DOUBLE=$<IF:$<BOOL:${SCN_USE_DOUBLE}>,1,0>)
+    target_compile_definitions(${target_name} PUBLIC
+        -DSCN_USE_LONG_DOUBLE=$<IF:$<BOOL:${SCN_USE_LONG_DOUBLE}>,1,0>)
+
     if (SCN_USE_BUNDLED_FAST_FLOAT)
         target_include_directories(${target_name} PRIVATE
                 $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/deps/fast_float/single_include>)
@@ -99,6 +110,13 @@ function(generate_header_only_target target_name)
     target_compile_definitions(${target_name} INTERFACE
             -DSCN_HEADER_ONLY=1)
     target_compile_features(${target_name} INTERFACE cxx_std_11)
+
+    target_compile_definitions(${target_name} INTERFACE
+        -DSCN_USE_FLOAT=$<IF:$<BOOL:${SCN_USE_FLOAT}>,1,0>)
+    target_compile_definitions(${target_name} INTERFACE
+        -DSCN_USE_DOUBLE=$<IF:$<BOOL:${SCN_USE_DOUBLE}>,1,0>)
+    target_compile_definitions(${target_name} INTERFACE
+        -DSCN_USE_LONG_DOUBLE=$<IF:$<BOOL:${SCN_USE_LONG_DOUBLE}>,1,0>)
 
     if (SCN_USE_BUNDLED_FAST_FLOAT)
         target_include_directories(${target_name} INTERFACE

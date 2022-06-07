@@ -234,9 +234,15 @@ namespace scn {
         SCN_MAKE_VALUE(bool_type, bool)
         SCN_MAKE_VALUE(code_point_type, code_point)
 
+#if SCN_USE_FLOAT
         SCN_MAKE_VALUE(float_type, float)
+#endif
+#if SCN_USE_DOUBLE
         SCN_MAKE_VALUE(double_type, double)
+#endif
+#if SCN_USE_LONG_DOUBLE
         SCN_MAKE_VALUE(long_double_type, long double)
+#endif
 
         SCN_MAKE_VALUE(buffer_type, span<CharT>)
         SCN_MAKE_VALUE(string_type, std::basic_string<CharT>)
@@ -366,12 +372,18 @@ namespace scn {
             case detail::code_point_type:
                 return vis(arg.m_value.template get_as<code_point>());
 
+#if SCN_USE_FLOAT
             case detail::float_type:
                 return vis(arg.m_value.template get_as<float>());
+#endif
+#if SCN_USE_DOUBLE
             case detail::double_type:
                 return vis(arg.m_value.template get_as<double>());
+#endif
+#if SCN_USE_LONG_DOUBLE
             case detail::long_double_type:
                 return vis(arg.m_value.template get_as<long double>());
+#endif
 
             case detail::buffer_type:
                 return vis(arg.m_value.template get_as<span<CharT>>());

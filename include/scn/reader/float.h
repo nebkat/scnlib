@@ -225,9 +225,16 @@ namespace scn {
         };
 
         // instantiate
+#if SCN_USE_FLOAT
         template struct float_scanner<float>;
+#endif
+#if SCN_USE_DOUBLE
         template struct float_scanner<double>;
+#endif
+#if SCN_USE_LONG_DOUBLE
         template struct float_scanner<long double>;
+#endif
+
 
         template <typename T>
         struct float_scanner_access : public float_scanner<T> {

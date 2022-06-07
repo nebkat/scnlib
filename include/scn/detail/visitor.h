@@ -83,9 +83,15 @@ namespace scn {
         return detail::visitor_boilerplate<detail::float_scanner<T>>( \
             val, *m_ctx, *m_pctx);                                    \
     }
+#if SCN_USE_FLOAT
         SCN_VISIT_FLOAT(float)
+#endif
+#if SCN_USE_DOUBLE
         SCN_VISIT_FLOAT(double)
+#endif
+#if SCN_USE_LONG_DOUBLE
         SCN_VISIT_FLOAT(long double)
+#endif
 #undef SCN_VISIT_FLOAT
 
         auto visit(std::basic_string<char_type>& val, detail::priority_tag<1>)

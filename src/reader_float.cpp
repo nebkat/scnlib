@@ -19,13 +19,16 @@
 #define SCN_READER_FLOAT_CPP
 #endif
 
+#define SCN_CAN_USE_FROM_CHARS (SCN_HAS_FLOAT_CHARCONV && !SCN_SKIP_FROM_CHARS)
+#define SCN_FLOAT_CAN_FALLBACK (SCN_CAN_USE_FROM_CHARS || !SCN_SKIP_CSTD)
+
 #include <scn/detail/args.h>
 #include <scn/reader/float.h>
 
 #include <cerrno>
 #include <clocale>
 
-#if SCN_HAS_FLOAT_CHARCONV
+#if SCN_CAN_USE_FROM_CHARS
 #include <charconv>
 #endif
 
@@ -207,7 +210,7 @@ namespace scn {
         }  // namespace cstd
 
         namespace from_chars {
-#if SCN_HAS_FLOAT_CHARCONV
+#if SCN_CAN_USE_FROM_CHARS
             template <typename T>
             struct read {
                 static expected<T> get(const char* str,
@@ -245,9 +248,14 @@ namespace scn {
                                      "from_chars");
                     }
                     if (result.ec == std::errc::result_out_of_range) {
-                        // Out of range, may be subnormal -> fall back to strtod
+                        // Out of range -> may be subnormal
                         // On gcc std::from_chars doesn't parse subnormals
+#if SCN_SKIP_CSTD
+                        return error(error::value_out_of_range, "from_chars");
+#else
+                        // fall back to strtod
                         return cstd::read<char, T>::get(str, chars, options);
+#endif
                     }
                     chars = static_cast<size_t>(result.ptr - str);
                     return value;
@@ -278,7 +286,11 @@ namespace scn {
                 if (((options & detail::float_scanner<T>::allow_hex) != 0) &&
                     is_hexfloat(str, len)) {
                     // fast_float doesn't support hexfloats
+#if SCN_FLOAT_CAN_FALLBACK
                     return from_chars::read<T>::get(str, chars, options);
+#else
+                    return error(error::invalid_format_string, "fast_float");
+#endif
                 }
 
                 T value{};
@@ -307,9 +319,13 @@ namespace scn {
                     // fast_float represents very large or small values as inf
                     // But, it also parses "inf", which from_chars does not
                     if (!(len >= 3 && (str[0] == 'i' || str[0] == 'I'))) {
-                        // Input was not actually infinity ->
-                        // invalid result, fall back to from_chars
+                        // Input was not actually infinity -> invalid result
+#if SCN_FLOAT_CAN_FALLBACK
+                        // fall back to from_chars
                         return from_chars::read<T>::get(str, chars, options);
+#else
+                        return error(error::value_out_of_range, "fast_float");
+#endif
                     }
                 }
                 chars = static_cast<size_t>(result.ptr - str);

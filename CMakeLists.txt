@@ -40,6 +40,9 @@ option(SCN_USE_FLOAT "Enable float support" ON)
 option(SCN_USE_DOUBLE "Enable double support" ON)
 option(SCN_USE_LONG_DOUBLE "Enable long double support" ON)
 
+option(SCN_SKIP_FROM_CHARS "Skip falling back to std::from_chars" OFF)
+option(SCN_SKIP_CSTD "Skip falling back to strtof/strtod" OFF)
+
 file(READ include/scn/detail/config.h config_h)
 if (NOT config_h MATCHES "SCN_VERSION SCN_COMPILER\\(([0-9]+), ([0-9]+), ([0-9]+)\\)")
     message(FATAL_ERROR "Cannot get SCN_VERSION from config.h")
@@ -93,6 +96,10 @@ function(generate_library_target target_name)
         -DSCN_USE_DOUBLE=$<IF:$<BOOL:${SCN_USE_DOUBLE}>,1,0>)
     target_compile_definitions(${target_name} PUBLIC
         -DSCN_USE_LONG_DOUBLE=$<IF:$<BOOL:${SCN_USE_LONG_DOUBLE}>,1,0>)
+    target_compile_definitions(${target_name} PUBLIC
+        -DSCN_SKIP_FROM_CHARS=$<IF:$<BOOL:${SCN_SKIP_FROM_CHARS}>,1,0>)
+    target_compile_definitions(${target_name} PUBLIC
+        -DSCN_SKIP_CSTD=$<IF:$<BOOL:${SCN_SKIP_CSTD}>,1,0>)
 
     if (SCN_USE_BUNDLED_FAST_FLOAT)
         target_include_directories(${target_name} PRIVATE
@@ -117,6 +124,10 @@ function(generate_header_only_target target_name)
         -DSCN_USE_DOUBLE=$<IF:$<BOOL:${SCN_USE_DOUBLE}>,1,0>)
     target_compile_definitions(${target_name} INTERFACE
         -DSCN_USE_LONG_DOUBLE=$<IF:$<BOOL:${SCN_USE_LONG_DOUBLE}>,1,0>)
+    target_compile_definitions(${target_name} INTERFACE
+        -DSCN_SKIP_FROM_CHARS=$<IF:$<BOOL:${SCN_SKIP_FROM_CHARS}>,1,0>)
+    target_compile_definitions(${target_name} INTERFACE
+        -DSCN_SKIP_CSTD=$<IF:$<BOOL:${SCN_SKIP_CSTD}>,1,0>)
 
     if (SCN_USE_BUNDLED_FAST_FLOAT)
         target_include_directories(${target_name} INTERFACE

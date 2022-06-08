@@ -116,7 +116,7 @@ namespace scn {
         template<typename T, typename CharT>
         struct type_enabled { static constexpr bool value = SCN_TYPE_CUSTOM; };
 
-        template<typename CharT> struct type_enabled<signed char, CharT> { static constexpr bool value = SCN_TYPE_SCHAR; };;
+        template<typename CharT> struct type_enabled<signed char, CharT> { static constexpr bool value = SCN_TYPE_SCHAR; };
         template<typename CharT> struct type_enabled<short, CharT> { static constexpr bool value = SCN_TYPE_SHORT; };
         template<typename CharT> struct type_enabled<int, CharT> { static constexpr bool value = SCN_TYPE_INT; };
         template<typename CharT> struct type_enabled<long, CharT> { static constexpr bool value = SCN_TYPE_LONG; };

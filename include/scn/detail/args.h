@@ -114,35 +114,35 @@ namespace scn {
         };
 
         template<typename T, typename CharT>
-        constexpr bool type_enabled = SCN_TYPE_CUSTOM;
+        struct type_enabled { static constexpr bool value = SCN_TYPE_CUSTOM; };
 
-        template<typename CharT> constexpr bool type_enabled<signed char, CharT> = SCN_TYPE_SCHAR;
-        template<typename CharT> constexpr bool type_enabled<short, CharT> = SCN_TYPE_SHORT;
-        template<typename CharT> constexpr bool type_enabled<int, CharT> = SCN_TYPE_INT;
-        template<typename CharT> constexpr bool type_enabled<long, CharT> = SCN_TYPE_LONG;
-        template<typename CharT> constexpr bool type_enabled<long long, CharT> = SCN_TYPE_LONG_LONG;
-        template<typename CharT> constexpr bool type_enabled<unsigned char, CharT> = SCN_TYPE_UCHAR;
-        template<typename CharT> constexpr bool type_enabled<unsigned short, CharT> = SCN_TYPE_USHORT;
-        template<typename CharT> constexpr bool type_enabled<unsigned int, CharT> = SCN_TYPE_UINT;
-        template<typename CharT> constexpr bool type_enabled<unsigned long, CharT> = SCN_TYPE_ULONG;
-        template<typename CharT> constexpr bool type_enabled<unsigned long long, CharT> = SCN_TYPE_ULONG_LONG;
-        template<typename CharT> constexpr bool type_enabled<bool, CharT> = SCN_TYPE_BOOL;
-        template<typename CharT> constexpr bool type_enabled<CharT, CharT> = SCN_TYPE_CHAR;
-        template<typename CharT> constexpr bool type_enabled<code_point, CharT> = SCN_TYPE_CODE_POINT;
-        template<typename CharT> constexpr bool type_enabled<float, CharT> = SCN_TYPE_FLOAT;
-        template<typename CharT> constexpr bool type_enabled<double, CharT> = SCN_TYPE_DOUBLE;
-        template<typename CharT> constexpr bool type_enabled<long double, CharT> = SCN_TYPE_LONG_DOUBLE;
-        template<typename CharT> constexpr bool type_enabled<span<CharT>, CharT> = SCN_TYPE_BUFFER;
-        template<typename CharT> constexpr bool type_enabled<std::basic_string<CharT>, CharT> = SCN_TYPE_STRING;
-        template<typename CharT> constexpr bool type_enabled<basic_string_view<CharT>, CharT> = SCN_TYPE_STRING_VIEW;
+        template<typename CharT> struct type_enabled<signed char, CharT> { static constexpr bool value = SCN_TYPE_SCHAR; };;
+        template<typename CharT> struct type_enabled<short, CharT> { static constexpr bool value = SCN_TYPE_SHORT; };
+        template<typename CharT> struct type_enabled<int, CharT> { static constexpr bool value = SCN_TYPE_INT; };
+        template<typename CharT> struct type_enabled<long, CharT> { static constexpr bool value = SCN_TYPE_LONG; };
+        template<typename CharT> struct type_enabled<long long, CharT> { static constexpr bool value = SCN_TYPE_LONG_LONG; };
+        template<typename CharT> struct type_enabled<unsigned char, CharT> { static constexpr bool value = SCN_TYPE_UCHAR; };
+        template<typename CharT> struct type_enabled<unsigned short, CharT> { static constexpr bool value = SCN_TYPE_USHORT; };
+        template<typename CharT> struct type_enabled<unsigned int, CharT> { static constexpr bool value = SCN_TYPE_UINT; };
+        template<typename CharT> struct type_enabled<unsigned long, CharT> { static constexpr bool value = SCN_TYPE_ULONG; };
+        template<typename CharT> struct type_enabled<unsigned long long, CharT> { static constexpr bool value = SCN_TYPE_ULONG_LONG; };
+        template<typename CharT> struct type_enabled<bool, CharT> { static constexpr bool value = SCN_TYPE_BOOL; };
+        template<typename CharT> struct type_enabled<CharT, CharT> { static constexpr bool value = SCN_TYPE_CHAR; };
+        template<typename CharT> struct type_enabled<code_point, CharT> { static constexpr bool value = SCN_TYPE_CODE_POINT; };
+        template<typename CharT> struct type_enabled<float, CharT> { static constexpr bool value = SCN_TYPE_FLOAT; };
+        template<typename CharT> struct type_enabled<double, CharT> { static constexpr bool value = SCN_TYPE_DOUBLE; };
+        template<typename CharT> struct type_enabled<long double, CharT> { static constexpr bool value = SCN_TYPE_LONG_DOUBLE; };
+        template<typename CharT> struct type_enabled<span<CharT>, CharT> { static constexpr bool value = SCN_TYPE_BUFFER; };
+        template<typename CharT> struct type_enabled<std::basic_string<CharT>, CharT> { static constexpr bool value = SCN_TYPE_STRING; };
+        template<typename CharT> struct type_enabled<basic_string_view<CharT>, CharT> { static constexpr bool value = SCN_TYPE_STRING_VIEW; };
 #if SCN_HAS_STRING_VIEW
-        template<typename CharT> constexpr bool type_enabled<std::basic_string_view<CharT>, CharT> = SCN_TYPE_STRING_VIEW;
+        template<typename CharT> struct type_enabled<std::basic_string_view<CharT>, CharT> { static constexpr bool value = SCN_TYPE_STRING_VIEW; };
 #endif
 
         template <typename Context, typename ParseCtx, typename T>
         error scan_custom_arg(void* arg, Context& ctx, ParseCtx& pctx) noexcept
         {
-            static_assert(type_enabled<T, typename ParseCtx::char_type>, "arg type is disabled");
+            static_assert(type_enabled<T, typename ParseCtx::char_type>::value, "arg type is disabled");
 
             return visitor_boilerplate<scanner<T>>(*static_cast<T*>(arg), ctx,
                                                    pctx);
@@ -466,7 +466,7 @@ namespace scn {
                 SCN_DECLVAL(priority_tag<1>)));
             static const type value = value_type::type_tag;
 
-            static_assert(type_enabled<T, CharT>, "arg type is disabled");
+            static_assert(type_enabled<T, CharT>::value, "arg type is disabled");
         };
 
         template <typename CharT>

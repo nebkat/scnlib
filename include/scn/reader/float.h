@@ -131,6 +131,13 @@ namespace scn {
                 auto do_parse_float = [&](span<const char_type> s) -> error {
                     T tmp = 0;
                     expected<std::ptrdiff_t> ret{0};
+#if SCN_USE_STATIC_LOCALE
+                    ret = _read_float(
+                        tmp, s,
+                        ctx.locale()
+                        .get_static()
+                        .decimal_point());
+#else
                     if (SCN_UNLIKELY((format_options & localized_digits) != 0 ||
                                      ((common_options & localized) != 0 &&
                                       (format_options & allow_hex) != 0))) {
@@ -151,6 +158,7 @@ namespace scn {
                                 .get((common_options & localized) != 0)
                                 .decimal_point());
                     }
+#endif
 
                     if (!ret) {
                         return ret.error();

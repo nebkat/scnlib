@@ -288,9 +288,11 @@ namespace scn {
                     flags.format = static_cast<::fast_float::chars_format>(
                         flags.format | ::fast_float::scientific);
                 }
+#if !SCN_USE_STATIC_LOCALE
                 if ((options & detail::float_scanner<T>::localized) != 0) {
                     flags.decimal_point = locale_decimal_point;
                 }
+#endif
 
                 const auto result = ::fast_float::from_chars_advanced(
                     str, str + len, value, flags);

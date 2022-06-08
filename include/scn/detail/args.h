@@ -114,98 +114,35 @@ namespace scn {
         };
 
         template<typename T, typename CharT>
-        struct arg_enabled
-        {
-            static constexpr bool check()
-            {
-                if (std::is_same<T, signed char>::value)
-                {
-                    return SCN_TYPE_SCHAR;
-                }
-                else if (std::is_same<T, short>::value)
-                {
-                    return SCN_TYPE_SHORT;
-                }
-                else if (std::is_same<T, int>::value)
-                {
-                    return SCN_TYPE_INT;
-                }
-                else if (std::is_same<T, long>::value)
-                {
-                    return SCN_TYPE_LONG;
-                }
-                else if (std::is_same<T, long long>::value)
-                {
-                    return SCN_TYPE_LONG_LONG;
-                }
-                else if (std::is_same<T, unsigned char>::value)
-                {
-                    return SCN_TYPE_UCHAR;
-                }
-                else if (std::is_same<T, unsigned short>::value)
-                {
-                    return SCN_TYPE_USHORT;
-                }
-                else if (std::is_same<T, unsigned int>::value)
-                {
-                    return SCN_TYPE_UINT;
-                }
-                else if (std::is_same<T, unsigned long>::value)
-                {
-                    return SCN_TYPE_ULONG;
-                }
-                else if (std::is_same<T, unsigned long long>::value)
-                {
-                    return SCN_TYPE_ULONG_LONG;
-                }
-                else if (std::is_same<T, bool>::value)
-                {
-                    return SCN_TYPE_BOOL;
-                }
-                else if (std::is_same<T, CharT>::value)
-                {
-                    return SCN_TYPE_CHAR;
-                }
-                else if (std::is_same<T, code_point>::value)
-                {
-                    return SCN_TYPE_CODE_POINT;
-                }
-                else if (std::is_same<T, float>::value)
-                {
-                    return SCN_TYPE_FLOAT;
-                }
-                else if (std::is_same<T, double>::value)
-                {
-                    return SCN_TYPE_DOUBLE;
-                }
-                else if (std::is_same<T, long double>::value)
-                {
-                    return SCN_TYPE_LONG_DOUBLE;
-                }
-                else if (std::is_same<T, span<CharT>>::value)
-                {
-                    return SCN_TYPE_BUFFER;
-                }
-                else if (std::is_same<T, std::basic_string<CharT>>::value)
-                {
-                    return SCN_TYPE_STRING;
-                }
-                else if (std::is_same<T, basic_string_view<CharT>>::value
+        constexpr bool type_enabled = SCN_TYPE_CUSTOM;
+
+        template<typename CharT> constexpr bool type_enabled<signed char, CharT> = SCN_TYPE_SCHAR;
+        template<typename CharT> constexpr bool type_enabled<short, CharT> = SCN_TYPE_SHORT;
+        template<typename CharT> constexpr bool type_enabled<int, CharT> = SCN_TYPE_INT;
+        template<typename CharT> constexpr bool type_enabled<long, CharT> = SCN_TYPE_LONG;
+        template<typename CharT> constexpr bool type_enabled<long long, CharT> = SCN_TYPE_LONG_LONG;
+        template<typename CharT> constexpr bool type_enabled<unsigned char, CharT> = SCN_TYPE_UCHAR;
+        template<typename CharT> constexpr bool type_enabled<unsigned short, CharT> = SCN_TYPE_USHORT;
+        template<typename CharT> constexpr bool type_enabled<unsigned int, CharT> = SCN_TYPE_UINT;
+        template<typename CharT> constexpr bool type_enabled<unsigned long, CharT> = SCN_TYPE_ULONG;
+        template<typename CharT> constexpr bool type_enabled<unsigned long long, CharT> = SCN_TYPE_ULONG_LONG;
+        template<typename CharT> constexpr bool type_enabled<bool, CharT> = SCN_TYPE_BOOL;
+        template<typename CharT> constexpr bool type_enabled<CharT, CharT> = SCN_TYPE_CHAR;
+        template<typename CharT> constexpr bool type_enabled<code_point, CharT> = SCN_TYPE_CODE_POINT;
+        template<typename CharT> constexpr bool type_enabled<float, CharT> = SCN_TYPE_FLOAT;
+        template<typename CharT> constexpr bool type_enabled<double, CharT> = SCN_TYPE_DOUBLE;
+        template<typename CharT> constexpr bool type_enabled<long double, CharT> = SCN_TYPE_LONG_DOUBLE;
+        template<typename CharT> constexpr bool type_enabled<span<CharT>, CharT> = SCN_TYPE_BUFFER;
+        template<typename CharT> constexpr bool type_enabled<std::basic_string<CharT>, CharT> = SCN_TYPE_STRING;
+        template<typename CharT> constexpr bool type_enabled<basic_string_view<CharT>, CharT> = SCN_TYPE_STRING_VIEW;
 #if SCN_HAS_STRING_VIEW
-                 || std::is_same<T, std::basic_string_view<CharT>>::value
+        template<typename CharT> constexpr bool type_enabled<std::basic_string_view<CharT>, CharT> = SCN_TYPE_STRING_VIEW;
 #endif
-                 )
-                {
-                    return SCN_TYPE_STRING_VIEW;
-                }
-                return SCN_TYPE_CUSTOM;
-            }
-        };
 
         template <typename Context, typename ParseCtx, typename T>
         error scan_custom_arg(void* arg, Context& ctx, ParseCtx& pctx) noexcept
         {
-            static_assert(arg_enabled<T, typename ParseCtx::char_type>::check(), "arg type is disabled");
+            static_assert(type_enabled<T, typename ParseCtx::char_type>, "arg type is disabled");
 
             return visitor_boilerplate<scanner<T>>(*static_cast<T*>(arg), ctx,
                                                    pctx);
@@ -529,7 +466,7 @@ namespace scn {
                 SCN_DECLVAL(priority_tag<1>)));
             static const type value = value_type::type_tag;
 
-            static_assert(arg_enabled<T, CharT>::check(), "arg type is disabled");
+            static_assert(type_enabled<T, CharT>, "arg type is disabled");
         };
 
         template <typename CharT>

@@ -190,7 +190,11 @@ namespace scn {
                 {
                     return SCN_TYPE_STRING;
                 }
-                else if (std::is_same<T, basic_string_view<CharT>>::value || std::is_same<T, std::basic_string_view<CharT>>::value)
+                else if (std::is_same<T, basic_string_view<CharT>>::value
+#if SCN_HAS_STRING_VIEW
+                 || std::is_same<T, std::basic_string_view<CharT>>::value
+#endif
+                 )
                 {
                     return SCN_TYPE_STRING_VIEW;
                 }

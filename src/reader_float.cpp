@@ -19,16 +19,13 @@
 #define SCN_READER_FLOAT_CPP
 #endif
 
-#define SCN_CAN_USE_FROM_CHARS (SCN_HAS_FLOAT_CHARCONV && !SCN_SKIP_FROM_CHARS)
-#define SCN_FLOAT_CAN_FALLBACK (SCN_CAN_USE_FROM_CHARS || !SCN_SKIP_CSTD)
-
 #include <scn/detail/args.h>
 #include <scn/reader/float.h>
 
 #include <cerrno>
 #include <clocale>
 
-#if SCN_CAN_USE_FROM_CHARS
+#if SCN_HAS_FLOAT_CHARCONV
 #include <charconv>
 #endif
 
@@ -145,7 +142,6 @@ namespace scn {
             template <typename CharT, typename T>
             struct read;
 
-#if SCN_USE_FLOAT
             template <>
             struct read<char, float> {
                 static expected<float> get(const char* str,
@@ -155,17 +151,7 @@ namespace scn {
                     return impl<float>(strtof, HUGE_VALF, str, chars, options);
                 }
             };
-            template <>
-            struct read<wchar_t, float> {
-                static expected<float> get(const wchar_t* str,
-                                           size_t& chars,
-                                           uint8_t options)
-                {
-                    return impl<float>(wcstof, HUGE_VALF, str, chars, options);
-                }
-            };
-#endif
-#if SCN_USE_DOUBLE
+
             template <>
             struct read<char, double> {
                 static expected<double> get(const char* str,
@@ -175,17 +161,7 @@ namespace scn {
                     return impl<double>(strtod, HUGE_VAL, str, chars, options);
                 }
             };
-            template <>
-            struct read<wchar_t, double> {
-                static expected<double> get(const wchar_t* str,
-                                            size_t& chars,
-                                            uint8_t options)
-                {
-                    return impl<double>(wcstod, HUGE_VAL, str, chars, options);
-                }
-            };
-#endif
-#if SCN_USE_LONG_DOUBLE
+
             template <>
             struct read<char, long double> {
                 static expected<long double> get(const char* str,
@@ -194,6 +170,25 @@ namespace scn {
                 {
                     return impl<long double>(strtold, HUGE_VALL, str, chars,
                                              options);
+                }
+            };
+
+            template <>
+            struct read<wchar_t, float> {
+                static expected<float> get(const wchar_t* str,
+                                           size_t& chars,
+                                           uint8_t options)
+                {
+                    return impl<float>(wcstof, HUGE_VALF, str, chars, options);
+                }
+            };
+            template <>
+            struct read<wchar_t, double> {
+                static expected<double> get(const wchar_t* str,
+                                            size_t& chars,
+                                            uint8_t options)
+                {
+                    return impl<double>(wcstod, HUGE_VAL, str, chars, options);
                 }
             };
             template <>
@@ -206,11 +201,10 @@ namespace scn {
                                              options);
                 }
             };
-#endif
         }  // namespace cstd
 
         namespace from_chars {
-#if SCN_CAN_USE_FROM_CHARS
+#if SCN_HAS_FLOAT_CHARCONV && SCN_USE_FROM_CHARS
             template <typename T>
             struct read {
                 static expected<T> get(const char* str,
@@ -250,11 +244,11 @@ namespace scn {
                     if (result.ec == std::errc::result_out_of_range) {
                         // Out of range -> may be subnormal
                         // On gcc std::from_chars doesn't parse subnormals
-#if SCN_SKIP_CSTD
-                        return error(error::value_out_of_range, "from_chars");
-#else
-                        // fall back to strtod
+#if SCN_USE_CSTD
+                        // fall back to cstd
                         return cstd::read<char, T>::get(str, chars, options);
+#else
+                        return error(error::value_out_of_range, "from_chars");
 #endif
                     }
                     chars = static_cast<size_t>(result.ptr - str);
@@ -286,7 +280,7 @@ namespace scn {
                 if (((options & detail::float_scanner<T>::allow_hex) != 0) &&
                     is_hexfloat(str, len)) {
                     // fast_float doesn't support hexfloats
-#if SCN_FLOAT_CAN_FALLBACK
+#if (SCN_CAN_USE_FROM_CHARS || SCN_USE_CSTD)
                     return from_chars::read<T>::get(str, chars, options);
 #else
                     return error(error::invalid_format_string, "fast_float");
@@ -320,7 +314,7 @@ namespace scn {
                     // But, it also parses "inf", which from_chars does not
                     if (!(len >= 3 && (str[0] == 'i' || str[0] == 'I'))) {
                         // Input was not actually infinity -> invalid result
-#if SCN_FLOAT_CAN_FALLBACK
+#if (SCN_CAN_USE_FROM_CHARS || SCN_USE_CSTD)
                         // fall back to from_chars
                         return from_chars::read<T>::get(str, chars, options);
 #else
@@ -335,7 +329,6 @@ namespace scn {
             template <typename T>
             struct read;
 
-#if SCN_USE_FLOAT
             template <>
             struct read<float> {
                 static expected<float> get(const char* str,
@@ -347,8 +340,6 @@ namespace scn {
                                        locale_decimal_point);
                 }
             };
-#endif
-#if SCN_USE_DOUBLE
             template <>
             struct read<double> {
                 static expected<double> get(const char* str,
@@ -360,8 +351,6 @@ namespace scn {
                                         locale_decimal_points);
                 }
             };
-#endif
-#if SCN_USE_LONG_DOUBLE
             template <>
             struct read<long double> {
                 static expected<long double> get(const char* str,
@@ -375,7 +364,6 @@ namespace scn {
                                                               options);
                 }
             };
-#endif
         }  // namespace fast_float
 
         template <typename CharT, typename T>
@@ -431,33 +419,26 @@ namespace scn {
 
 #if SCN_INCLUDE_SOURCE_DEFINITIONS
 
-#if SCN_USE_FLOAT
         template expected<float>
         float_scanner<float>::_read_float_impl(const char*, size_t&, char);
-        template expected<float> float_scanner<float>::_read_float_impl(
-            const wchar_t*,
-            size_t&,
-            wchar_t);
-#endif
-#if SCN_USE_DOUBLE
         template expected<double>
         float_scanner<double>::_read_float_impl(const char*, size_t&, char);
-        template expected<double> float_scanner<double>::_read_float_impl(
-            const wchar_t*,
-            size_t&,
-            wchar_t);
-#endif
-#if SCN_USE_LONG_DOUBLE
         template expected<long double>
         float_scanner<long double>::_read_float_impl(const char*,
                                                      size_t&,
                                                      char);
+        template expected<float> float_scanner<float>::_read_float_impl(
+            const wchar_t*,
+            size_t&,
+            wchar_t);
+        template expected<double> float_scanner<double>::_read_float_impl(
+            const wchar_t*,
+            size_t&,
+            wchar_t);
         template expected<long double>
         float_scanner<long double>::_read_float_impl(const wchar_t*,
                                                      size_t&,
                                                      wchar_t);
-#endif
-
 #endif
     }  // namespace detail
 

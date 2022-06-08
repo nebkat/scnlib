@@ -587,24 +587,19 @@ namespace scn {
         basic_custom_locale_ref<char>::read_num<wchar_t>(wchar_t&,
                                                          const string_type&,
                                                          int) const;
-#if SCN_USE_FLOAT
         template expected<std::ptrdiff_t>
         basic_custom_locale_ref<char>::read_num<float>(float&,
                                                        const string_type&,
                                                        int) const;
-#endif
-#if SCN_USE_DOUBLE
         template expected<std::ptrdiff_t>
         basic_custom_locale_ref<char>::read_num<double>(double&,
                                                         const string_type&,
                                                         int) const;
-#endif
-#if SCN_USE_LONG_DOUBLE
         template expected<std::ptrdiff_t>
         basic_custom_locale_ref<char>::read_num<long double>(long double&,
                                                              const string_type&,
                                                              int) const;
-#endif
+
         template expected<std::ptrdiff_t> basic_custom_locale_ref<
             wchar_t>::read_num<signed char>(signed char&,
                                             const string_type&,
@@ -645,24 +640,18 @@ namespace scn {
             wchar_t>::read_num<unsigned long long>(unsigned long long&,
                                                    const string_type&,
                                                    int) const;
-#if SCN_USE_FLOAT
         template expected<std::ptrdiff_t>
         basic_custom_locale_ref<wchar_t>::read_num<float>(float&,
                                                           const string_type&,
                                                           int) const;
-#endif
-#if SCN_USE_DOUBLE
         template expected<std::ptrdiff_t>
         basic_custom_locale_ref<wchar_t>::read_num<double>(double&,
                                                            const string_type&,
                                                            int) const;
-#endif
-#if SCN_USE_LONG_DOUBLE
         template expected<std::ptrdiff_t> basic_custom_locale_ref<
             wchar_t>::read_num<long double>(long double&,
                                             const string_type&,
                                             int) const;
-#endif
         template expected<std::ptrdiff_t>
         basic_custom_locale_ref<wchar_t>::read_num<char>(char&,
                                                          const string_type&,

@@ -280,7 +280,7 @@ namespace scn {
                 if (((options & detail::float_scanner<T>::allow_hex) != 0) &&
                     is_hexfloat(str, len)) {
                     // fast_float doesn't support hexfloats
-#if (SCN_CAN_USE_FROM_CHARS || SCN_USE_CSTD)
+#if (SCN_USE_FROM_CHARS || SCN_USE_CSTD)
                     return from_chars::read<T>::get(str, chars, options);
 #else
                     return error(error::invalid_format_string, "fast_float");
@@ -314,7 +314,7 @@ namespace scn {
                     // But, it also parses "inf", which from_chars does not
                     if (!(len >= 3 && (str[0] == 'i' || str[0] == 'I'))) {
                         // Input was not actually infinity -> invalid result
-#if (SCN_CAN_USE_FROM_CHARS || SCN_USE_CSTD)
+#if (SCN_USE_FROM_CHARS || SCN_USE_CSTD)
                         // fall back to from_chars
                         return from_chars::read<T>::get(str, chars, options);
 #else

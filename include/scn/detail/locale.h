@@ -26,38 +26,6 @@
 #include <cwchar>
 #include <string>
 
-#ifndef SCN_DEFAULT_LOCALE_TRUE
-#define SCN_DEFAULT_LOCALE_TRUE "true"
-#endif
-
-#ifndef SCN_DEFAULT_LOCALE_FALSE
-#define SCN_DEFAULT_LOCALE_FALSE "false"
-#endif
-
-#ifndef SCN_DEFAULT_LOCALE_DECIMAL
-#define SCN_DEFAULT_LOCALE_DECIMAL '.'
-#endif
-
-#ifndef SCN_DEFAULT_LOCALE_SEPARATOR
-#define SCN_DEFAULT_LOCALE_SEPARATOR ','
-#endif
-
-#ifndef SCN_DEFAULT_LOCALE_TRUE_WIDE
-#define SCN_DEFAULT_LOCALE_TRUE_WIDE L"true"
-#endif
-
-#ifndef SCN_DEFAULT_LOCALE_FALSE_WIDE
-#define SCN_DEFAULT_LOCALE_FALSE_WIDE L"false"
-#endif
-
-#ifndef SCN_DEFAULT_LOCALE_DECIMAL_WIDE
-#define SCN_DEFAULT_LOCALE_DECIMAL_WIDE L'.'
-#endif
-
-#ifndef SCN_DEFAULT_LOCALE_SEPARATOR_WIDE
-#define SCN_DEFAULT_LOCALE_SEPARATOR_WIDE L','
-#endif
-
 namespace scn {
     SCN_BEGIN_NAMESPACE
 
@@ -144,38 +112,38 @@ namespace scn {
         struct locale_defaults<char> {
             static constexpr string_view truename()
             {
-                return {SCN_DEFAULT_LOCALE_TRUE};
+                return {"true"};
             }
             static constexpr string_view falsename()
             {
-                return {SCN_DEFAULT_LOCALE_FALSE};
+                return {"false"};
             }
             static constexpr char decimal_point() noexcept
             {
-                return SCN_DEFAULT_LOCALE_DECIMAL;
+                return '.';
             }
             static constexpr char thousands_separator() noexcept
             {
-                return SCN_DEFAULT_LOCALE_SEPARATOR;
+                return ',';
             }
         };
         template <>
         struct locale_defaults<wchar_t> {
             static constexpr wstring_view truename()
             {
-                return {SCN_DEFAULT_LOCALE_TRUE_WIDE};
+                return {L"true"};
             }
             static constexpr wstring_view falsename()
             {
-                return {SCN_DEFAULT_LOCALE_FALSE_WIDE};
+                return {L"false"};
             }
             static constexpr wchar_t decimal_point() noexcept
             {
-                return SCN_DEFAULT_LOCALE_DECIMAL_WIDE;
+                return L'.';
             }
             static constexpr wchar_t thousands_separator() noexcept
             {
-                return SCN_DEFAULT_LOCALE_SEPARATOR_WIDE;
+                return L',';
             }
         };
     }  // namespace detail
@@ -502,6 +470,15 @@ namespace scn {
 
         // default
         constexpr basic_locale_ref() = default;
+
+        // hardcoded "C", constexpr, should be preferred whenever possible
+        constexpr static_type get_static() const
+        {
+            return {};
+        }
+
+#if !SCN_USE_STATIC_LOCALE
+
         // nullptr = global
         constexpr basic_locale_ref(const void* p) : m_payload(p) {}
 
@@ -513,12 +490,6 @@ namespace scn {
         constexpr bool has_custom() const
         {
             return m_payload != nullptr;
-        }
-
-        // hardcoded "C", constexpr, should be preferred whenever possible
-        constexpr static_type get_static() const
-        {
-            return {};
         }
 
         // hardcoded "C", not constexpr
@@ -599,6 +570,7 @@ namespace scn {
         mutable detail::unique_ptr<custom_type> m_custom{nullptr};
         const void* m_payload{nullptr};
         default_type m_default{};
+#endif
     };
 
     template <typename CharT, typename Locale>

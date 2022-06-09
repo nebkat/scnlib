@@ -82,6 +82,7 @@ namespace scn {
                              size_t& chars,
                              uint8_t options)
             {
+#if !SCN_USE_STATIC_LOCALE
                 // Get current C locale
                 const auto loc = std::setlocale(LC_NUMERIC, nullptr);
                 // For whatever reason, this cannot be stored in the heap if
@@ -93,15 +94,19 @@ namespace scn {
                 std::strcpy(locbuf, loc);
 
                 std::setlocale(LC_NUMERIC, "C");
+#endif
 
                 CharT* end{};
                 errno = 0;
                 T f = f_strtod(str, &end);
                 chars = static_cast<size_t>(end - str);
                 auto err = errno;
+
+#if !SCN_USE_STATIC_LOCALE
                 // Reset locale
                 std::setlocale(LC_NUMERIC, locbuf);
                 errno = 0;
+#endif
 
                 SCN_GCC_COMPAT_PUSH
                 SCN_GCC_COMPAT_IGNORE("-Wfloat-equal")

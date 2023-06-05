@@ -60,6 +60,8 @@ option(SCN_TYPE_CUSTOM "Enable user types" ON)
 option(SCN_USE_FROM_CHARS "Fall back to std::from_chars" ON)
 option(SCN_USE_CSTD "Fall back to strtod" ON)
 
+option(SCN_USE_STATIC_LOCALE "Disable all localization" OFF)
+
 file(READ include/scn/detail/config.h config_h)
 if (NOT config_h MATCHES "SCN_VERSION SCN_COMPILER\\(([0-9]+), ([0-9]+), ([0-9]+)\\)")
     message(FATAL_ERROR "Cannot get SCN_VERSION from config.h")
@@ -153,6 +155,9 @@ function(generate_library_target target_name)
     target_compile_definitions(${target_name} PUBLIC
         -DSCN_USE_CSTD=$<IF:$<BOOL:${SCN_USE_CSTD}>,1,0>)
 
+    target_compile_definitions(${target_name} PUBLIC
+        -DSCN_USE_STATIC_LOCALE=$<IF:$<BOOL:${SCN_USE_STATIC_LOCALE}>,1,0>)
+
     if (SCN_USE_BUNDLED_FAST_FLOAT)
         target_include_directories(${target_name} PRIVATE
                 $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/deps/fast_float/single_include>)
@@ -215,6 +220,9 @@ function(generate_header_only_target target_name)
         -DSCN_USE_FROM_CHARS=$<IF:$<BOOL:${SCN_USE_FROM_CHARS}>,1,0>)
     target_compile_definitions(${target_name} INTERFACE
         -DSCN_USE_CSTD=$<IF:$<BOOL:${SCN_USE_CSTD}>,1,0>)
+
+    target_compile_definitions(${target_name} INTERFACE
+        -DSCN_USE_STATIC_LOCALE=$<IF:$<BOOL:${SCN_USE_STATIC_LOCALE}>,1,0>)
 
     if (SCN_USE_BUNDLED_FAST_FLOAT)
         target_include_directories(${target_name} INTERFACE

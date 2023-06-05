@@ -57,10 +57,10 @@ option(SCN_TYPE_STRING "Enable std::string" ON)
 option(SCN_TYPE_STRING_VIEW "Enable string_view" ON)
 option(SCN_TYPE_CUSTOM "Enable user types" ON)
 
-option(SCN_USE_FROM_CHARS "Fall back to std::from_chars" ON)
+option(SCN_USE_FROM_CHARS "Fall back to std::from_chars" OFF)
 option(SCN_USE_CSTD "Fall back to strtod" ON)
 
-option(SCN_USE_STATIC_LOCALE "Disable all localization" OFF)
+option(SCN_USE_STATIC_LOCALE "Disable all localization" ON)
 
 file(READ include/scn/detail/config.h config_h)
 if (NOT config_h MATCHES "SCN_VERSION SCN_COMPILER\\(([0-9]+), ([0-9]+), ([0-9]+)\\)")

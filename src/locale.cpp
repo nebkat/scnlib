@@ -459,6 +459,9 @@ namespace scn {
             return {};
         }
 
+        SCN_GCC_PUSH
+        SCN_GCC_IGNORE("-Wmaybe-uninitialized")
+
         template <typename T, typename CharT>
         expected<std::ptrdiff_t> do_read_num(
             T& val,
@@ -500,6 +503,8 @@ namespace scn {
                          "exceptions enabled");
 #endif
         }
+
+        SCN_GCC_POP
 
         template <>
         expected<std::ptrdiff_t> do_read_num(wchar_t&,
